@@ -1,1 +1,1 @@
-C:\Users\halcy\OneDrive\デスクトップ\test2 
+web: gunicorn run:app --log-file=- 
