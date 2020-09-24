@@ -1,46 +1,79 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>{{name}}</title>
+        <title>Web家計簿</title>
     </head>
     <body>
-    {% if name == "melody" %}
-    <h1>めろでぃちゃん</h1>
-    {% else %}
-    <h1> めろでぃちゃんではない </h1>
+    <h1>Web家計簿</h1>
+    <h1>現在の収支：{{sum}}円</h1>
+
+    {% if invalid %}
+    <script> alert("不正な入力です") </script>
     {% endif %}
 
-    <form action="/index" method="POST">
-        <input type="text" name="name" placeholder="Enter name">
-        <input type="submit" value="Submit">
-    </form>
-
     <form action="/add" method="post">
-        <input type="text" name="title" placeholder="title">
-        <input type="text" name="body" placeholder="body">
-        <input type="submit" value="Add">
+        <input type="text" name="title" placeholder="タイトル">
+        <input type="text" name="value" placeholder="金額">
+        <input type="submit" value="追加">
     </form>
 
-    <form action="/update" method="post" id="update">
-        <input type="text" name="title" placeholder="title">
-        <input type="text" name="body" placeholder="body">
-        <input type="submit" value="Update">
     </form>
     <form action="/delete" method="post" id="delete">
-        <input type="submit" value="Delete Selected All Onegai">
+        <input type="submit" value="選択した項目を削除">
     </form>
-        {% for onegai in all_onegai %}
-        <div>
-            <input type="radio" name="update" form="update" value={{onegai.id}}>
-            <input type="checkbox" name="delete" form="delete" value={{onegai.id}}>
-            {{onegai.title}}：{{onegai.body}}（{{onegai.date}}）
-        </div>
+
+    <table class="table">
+        <thead class="thead-light">
+            <tr></tr>
+            <th scope="col"></th>
+            <th scope="col">タイトル</th>
+            <th scope="col">収支</th>
+            <th scope="col">日付</th>
+            </tr>
+        </thead>
+        
+        {% for history in all_history %}
+            <tbody>
+                <tr>
+                <td><input type="checkbox" name="delete" form="delete" value={{history.id}}> </td>
+                <td> {{ history.title }} </td>
+                <td> {{ history.value }} </td>
+                <td> {{ history.date }} </td>
+                </tr>
+            </tbody>
         {% endfor %}
+        </table>
 
-    {% for onegai in all_onegai %}
-    <p>{{onegai.title}}：{{onegai.body}}（{{onegai.date}}）</p>
-    {% endfor %}
+    <!-- <img src= "/static/images/graph.png" alt="収支">
 
-    <img src="/static/images/melody.jpg" alt="まいめろ">
-    </body>
+    <canvas id="myLineChart"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+    <script>
+        var ctx = document.getElementById("myLineChart");
+        var myLineChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: [],
+            datasets: [
+              {
+                label: '収支',
+                data: [],
+                borderColor: "rgba(255,0,0,1)",
+                backgroundColor: "rgba(0,0,0,0)"
+              }
+            ]
+          } 
+        });
+        function updateChart(){
+            var cnt = 0;
+            for(var date in dates) myLineChart.data.datasets[0].push(date);
+            for(var value in values) myLineChart.data.labels.push(value);
+            // }
+            alert(cnt);
+            myLineChart.update();
+        }
+        </script>
+        <p><button onclick="updateChart()" type="button">収支グラフを作成</button></p>
+
+    </body> -->
 </html>

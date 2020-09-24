@@ -1,18 +1,18 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy import Column, Integer, String, Text, Date
 from application.models.database import Base
-from datetime import datetime
+import datetime
 
 
-class OnegaiContent(Base):
-    __tablename__ = 'onegaicontents'
+class UsageHistory(Base):
+    __tablename__ = 'usagehistory'
     id = Column(Integer, primary_key=True)
-    title = Column(String(128), unique=True)
-    body = Column(Text)
-    date = Column(DateTime, default=datetime.now())
+    title = Column(String(32))
+    value = Column(Integer)
+    date = Column(Date,default = datetime.date.today())
 
-    def __init__(self, title=None, body=None, date=None):
+    def __init__(self, title=None, value=None, date=None):
         self.title = title
-        self.body = body
+        self.value = value
         self.date = date
 
     def __repr__(self):

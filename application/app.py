@@ -1,58 +1,72 @@
-#Flaskとrender_template（HTMLを表示させるための関数）をインポート
 from flask import Flask,render_template,request
 from application.models.database import db_session
-from application.models.models import OnegaiContent
-from datetime import datetime
+from application.models.models import UsageHistory
+import datetime
+import matplotlib.pyplot as plt
 
-#Flaskオブジェクトの生成
 app = Flask(__name__)
 
+def calc():
+    all_history = UsageHistory.query.all()
+    sum = 0
+    for history in all_history:
+        sum += history.value
+    return sum
 
-#「/」へアクセスがあった場合に、"Hello World"の文字列を返す
+# def make_image():
+#     all_history = UsageHistory.query.all()
+#     time = []
+#     val = []
+#     fig = plt.figure()
+#     current_sum = 0
+#     current_time = 0
+#     for history in all_history:
+#         current_sum += history.value
+#         current_time += 1
+#         time.append(current_time)
+#         val.append(current_sum)
+#     plt.plot(time, val)
+#     fig.savefig('./application/static/images/graph.png')
+
 @app.route("/")
 def hello():
+    #make_image()
     return index()
 
 
-#「/index」へアクセスがあった場合に、「index.html」を返す
 @app.route("/index")
 def index():
-    name = request.args.get("name")
-    all_onegai = OnegaiContent.query.all()
-    return render_template("index.html",name=name,all_onegai=all_onegai)
+    sum = calc()
+    #make_image()
+    all_history = UsageHistory.query.all()
+    return render_template("index.html",all_history=all_history,sum=sum,invalid=False)
 
-@app.route("/index",methods=["post"])
-def post():
-    name = request.form["name"]
-    all_onegai = OnegaiContent.query.all()
-    return render_template("index.html",name=name,all_onegai=all_onegai)
+@app.route("/index")
+def input_error():
+    sum = calc()
+    all_history = UsageHistory.query.all()
+    return render_template("index.html",all_history=all_history,sum=sum,invalid=True)
 
 @app.route("/add",methods=["post"])
 def add():
     title = request.form["title"]
-    body = request.form["body"]
-    content = OnegaiContent(title,body,datetime.now())
-    db_session.add(content)
-    db_session.commit()
-    return index()
-
-@app.route("/update",methods=["post"])
-def update():
-    content = OnegaiContent.query.filter_by(id=request.form["update"]).first()
-    content.title = request.form["title"]
-    content.body = request.form["body"]
-    db_session.commit()
-    return index()
+    value = request.form["value"]
+    if(str.isdecimal(value)):
+        content = UsageHistory(title,value,datetime.date.today())
+        db_session.add(content)
+        db_session.commit()
+        return index()
+    else:
+        return input_error()
 
 @app.route("/delete",methods=["post"])
 def delete():
     id_list = request.form.getlist("delete")
     for id in id_list:
-        content = OnegaiContent.query.filter_by(id=id).first()
+        content = UsageHistory.query.filter_by(id=id).first()
         db_session.delete(content)
     db_session.commit()
     return index()
 
-#おまじない
 if __name__ == "__main__":
     app.run(debug=True)
