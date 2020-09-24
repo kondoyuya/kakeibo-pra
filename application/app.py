@@ -50,7 +50,10 @@ def input_error():
 def add():
     title = request.form["title"]
     value = request.form["value"]
-    if(str.isdecimal(value)):
+    check = value
+    if(check[0]=='-'):
+        check = value[1:]
+    if(str.isdecimal(check) and len(check) > 0):
         content = UsageHistory(title,value,datetime.date.today())
         db_session.add(content)
         db_session.commit()
